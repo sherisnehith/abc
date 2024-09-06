@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitMe – User Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h1 class="text-3xl font-bold text-center mb-6">Enter User Details</h1>
+
+    <!-- User Details Form -->
+    <form id="user-details-form">
+      <div class="mb-4">
+        <label for="name" class="block text-gray-700">Name:</label>
+        <input type="text" id="name" class="w-full p-2 border rounded" placeholder="Enter your name" required>
+      </div>
+      <div class="mb-4">
+        <label for="email" class="block text-gray-700">Email:</label>
+        <input type="email" id="email" class="w-full p-2 border rounded" placeholder="Enter your email" required>
+      </div>
+      <div class="mb-4">
+        <label for="age" class="block text-gray-700">Age:</label>
+        <input type="number" id="age" class="w-full p-2 border rounded" placeholder="Enter your age" required>
+      </div>
+      <div class="mb-4">
+        <label for="membership" class="block text-gray-700">Membership:</label>
+        <select id="membership" class="w-full p-2 border rounded" required>
+          <option value="">Select Membership</option>
+          <option value="Basic">Basic</option>
+          <option value="Premium">Premium</option>
+        </select>
+      </div>
+      <button type="button" onclick="submitUserDetails()" class="bg-blue-500 text-white p-2 w-full rounded">Submit</button>
+    </form>
+
+    <!-- Success message -->
+    <div id="success-message" class="mt-4 p-4 bg-green-100 text-green-700 rounded hidden">
+      User details saved successfully!
+    </div>
+  </div>
+
+  <script>
+    function submitUserDetails() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const age = document.getElementById('age').value;
+      const membership = document.getElementById('membership').value;
+      const successMessage = document.getElementById('success-message');
+
+      if (name && email && age && membership) {
+        // Save user data in localStorage for simplicity
+        localStorage.setItem('userName', name);
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userAge', age);
+        localStorage.setItem('userMembership', membership);
+
+        // Show success message
+        successMessage.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

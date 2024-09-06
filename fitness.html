@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitMe – AI-Powered Personalized Fitness Coach</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto p-4">
+    <header class="mb-6">
+      <h1 class="text-3xl font-bold text-center mb-2">FitMe - Your Personalized Fitness Coach</h1>
+      <p class="text-center text-gray-700">Boost your fitness activities and keep fit with AI-powered plans and tracking</p>
+    </header>
+
+    <!-- Personalized Fitness Plan Section -->
+    <section id="fitness-plan" class="mb-6">
+      <h2 class="text-2xl font-semibold mb-4">Personalized Fitness Plan</h2>
+      <form id="plan-form" class="bg-white p-4 rounded shadow-md">
+        <div class="mb-4">
+          <label for="preferences" class="block text-gray-700">Preferences:</label>
+          <select id="preferences" class="w-full p-2 border rounded">
+            <option value="Cardio">Cardio</option>
+            <option value="Strength">Strength</option>
+            <option value="Yoga">Yoga</option>
+            <option value="Pilates">Pilates</option>
+            <option value="HIIT">HIIT</option>
+            <option value="Flexibility">Flexibility</option>
+            <option value="Endurance">Endurance</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label for="goals" class="block text-gray-700">Goals:</label>
+          <input type="text" id="goals" class="w-full p-2 border rounded" placeholder="e.g., Weight Loss, Muscle Gain">
+        </div>
+        <div class="mb-4">
+          <label for="availability" class="block text-gray-700">Time Availability (minutes):</label>
+          <input type="number" id="availability" class="w-full p-2 border rounded" placeholder="e.g., 30 minutes/day">
+        </div>
+        <div class="mb-4">
+          <label for="environment" class="block text-gray-700">Environment:</label>
+          <select id="environment" class="w-full p-2 border rounded">
+            <option value="Gym">Gym</option>
+            <option value="Natural">Natural</option>
+          </select>
+        </div>
+        <button type="button" onclick="generatePlan()" class="bg-blue-500 text-white p-2 rounded">Generate Plan</button>
+      </form>
+      <div id="plan-output" class="mt-4 p-4 bg-green-100 rounded hidden">
+        <!-- Generated Plan Output -->
+      </div>
+    </section>
+
+    <!-- Progress Tracking Section -->
+    <section id="progress-tracking" class="mb-6">
+      <h2 class="text-2xl font-semibold mb-4">Progress Tracking</h2>
+      <p>Track your fitness journey with ease. Input your daily workouts, calories burned, and weight to monitor your progress over time.</p>
+      <form id="progress-form" class="bg-white p-4 rounded shadow-md">
+        <div class="mb-4">
+          <label for="workout-done" class="block text-gray-700">Workout Completed:</label>
+          <input type="text" id="workout-done" class="w-full p-2 border rounded" placeholder="e.g., Cardio, Strength">
+        </div>
+        <div class="mb-4">
+          <label for="calories-burned" class="block text-gray-700">Calories Burned:</label>
+          <input type="number" id="calories-burned" class="w-full p-2 border rounded" placeholder="e.g., 300">
+        </div>
+        <div class="mb-4">
+          <label for="current-weight" class="block text-gray-700">Current Weight (kg):</label>
+          <input type="number" id="current-weight" class="w-full p-2 border rounded" placeholder="e.g., 70">
+        </div>
+        <button type="button" onclick="saveProgress()" class="bg-blue-500 text-white p-2 rounded">Save Progress</button>
+      </form>
+      <div id="progress-output" class="mt-4 p-4 bg-green-100 rounded hidden">
+        <!-- Progress Output -->
+      </div>
+    </section>
+
+    <!-- Workout Completion Section -->
+    <section id="workout-completion" class="mb-6 hidden">
+      <h2 class="text-2xl font-semibold mb-4">Workout Completion</h2>
+      <div id="workout-completion-list" class="p-4 bg-yellow-100 rounded">
+        <!-- Workout Completion Checklist -->
+      </div>
+      <div id="points-output" class="mt-4 p-4 bg-yellow-200 rounded hidden">
+        <label for="points-dropdown" class="block text-gray-700">Points Earned:</label>
+        <select id="points-dropdown" class="w-full p-2 border rounded">
+          <!-- Points options will be populated here -->
+        </select>
+      </div>
+      <button type="button" onclick="saveWorkoutCompletion()" class="bg-blue-500 text-white p-2 mt-4 rounded">Save Workout Completion</button>
+      <button onclick="window.location.href='rankings.html';"
+      style="background-color: #3b82f6; /* Blue color */
+             color: white; /* Text color */
+             border: none; /* Remove default border */
+             padding: 10px 20px; /* Add padding */
+             border-radius: 5px; /* Rounded corners */
+             font-size: 16px; /* Font size */
+             cursor: pointer; /* Pointer cursor on hover */
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Box shadow */
+             transition: background-color 0.3s ease;"> <!-- Smooth color transition -->
+  Go to Rankings
+</button>
+
+    </section>
+
+    <!-- Diet Plan Section -->
+    <section id="diet-plan" class="mb-6">
+      <h2 class="text-2xl font-semibold mb-4">Personalized Diet Plan</h2>
+      <div id="diet-output" class="p-4 bg-yellow-100 rounded hidden">
+        <!-- Generated Diet Plan -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Points for each exercise type
+    const exercisePoints = {
+      'Cardio': 10,
+      'Strength': 15,
+      'Yoga': 12,
+      'Pilates': 12,
+      'HIIT': 20,
+      'Flexibility': 10,
+      'Endurance': 18
+    };
+  
+    // Track points for completed exercises
+    let totalPoints = 0;
+
+    // Function to calculate points based on completed exercises
+    function calculatePoints(exerciseType, time) {
+      const pointsPerMinute = exercisePoints[exerciseType] || 0;
+      return pointsPerMinute * time / 30; // Example: 30 minutes is base time
+    }
+  
+    // Generate the fitness plan based on user input
+    function generatePlan() {
+      const preferences = document.getElementById('preferences').value;
+      const goals = document.getElementById('goals').value;
+      const availability = parseInt(document.getElementById('availability').value);
+      const environment = document.getElementById('environment').value;
+  
+      // Check if inputs are valid
+      if (!preferences || !goals || isNaN(availability) || !environment) {
+        alert('Please fill in all fields');
+        return;
+      }
+  
+      // Generate workout plan
+      let workoutPlan = '';
+      if (environment === 'Gym') {
+        workoutPlan = generateGymPlan(preferences, availability);
+      } else {
+        workoutPlan = generateNaturalPlan(preferences, availability);
+      }
+  
+      // Display workout plan
+      const planOutput = document.getElementById('plan-output');
+      planOutput.innerHTML = `<p><strong>Generated Plan for ${preferences} (${environment}):</strong></p>
+                              <p>${workoutPlan}</p>`;
+      planOutput.classList.remove('hidden');
+  
+      // Generate and display diet plan based on preferences
+      const dietPlan = generateDietPlan(preferences);
+      const dietOutput = document.getElementById('diet-output');
+      dietOutput.innerHTML = `<p><strong>Diet Plan for ${preferences}:</strong></p>
+                              <p>${dietPlan}</p>`;
+      dietOutput.classList.remove('hidden');
+  
+      // Generate workout completion checklist
+      const workouts = workoutPlan.split('<br>'); // Split by line break for checklist
+      let checklist = '<ul>';
+      workouts.forEach(workout => {
+        const workoutName = workout.split(':')[0].trim();
+        if (workoutName) {
+          checklist += `<li><input type="checkbox" id="${workoutName}" data-points="${calculatePoints(preferences, availability)}" /> ${workoutName}</li>`;
+        }
+      });
+      checklist += '</ul>';
+  
+      const workoutCompletionList = document.getElementById('workout-completion-list');
+      workoutCompletionList.innerHTML = checklist;
+      document.getElementById('workout-completion').classList.remove('hidden');
+  
+      // Save plan to localStorage
+      localStorage.setItem('fitnessPlan', JSON.stringify({ preferences, goals, availability, environment }));
+    }
+  
+    function saveProgress() {
+      const workoutDone = document.getElementById('workout-done').value;
+      const caloriesBurned = document.getElementById('calories-burned').value;
+      const currentWeight = document.getElementById('current-weight').value;
+  
+      const progressOutput = document.getElementById('progress-output');
+  
+      progressOutput.innerHTML = `<p><strong>Progress Saved:</strong></p>
+                                  <p>Workout: ${workoutDone}</p>
+                                  <p>Calories Burned: ${caloriesBurned} kcal</p>
+                                  <p>Current Weight: ${currentWeight} kg</p>`;
+      progressOutput.classList.remove('hidden');
+    }
+  
+    function saveWorkoutCompletion() {
+      const checkboxes = document.querySelectorAll('#workout-completion-list input[type="checkbox"]');
+      const pointsDropdown = document.getElementById('points-dropdown');
+      let totalPoints = 0;
+      
+      pointsDropdown.innerHTML = ''; // Clear previous options
+
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          totalPoints += parseInt(checkbox.getAttribute('data-points'), 10);
+        }
+      });
+      
+      // Display total points in dropdown
+      const option = document.createElement('option');
+      option.value = totalPoints;
+      option.textContent = `${totalPoints} Points Earned`;
+      pointsDropdown.appendChild(option);
+
+      document.getElementById('points-output').classList.remove('hidden');
+    }
+  
+    // Gym plan generation functions
+    function generateGymPlan(preferences, availability) {
+      switch (preferences) {
+        case 'Cardio':
+          return generateGymCardioPlan(availability);
+        case 'Strength':
+          return generateGymStrengthPlan(availability);
+        case 'Yoga':
+          return generateGymYogaPlan(availability);
+        case 'Pilates':
+          return generateGymPilatesPlan(availability);
+        case 'HIIT':
+          return generateGymHIITPlan(availability);
+        case 'Flexibility':
+          return generateGymFlexibilityPlan(availability);
+        case 'Endurance':
+          return generateGymEndurancePlan(availability);
+        default:
+          return 'Invalid preference';
+      }
+    }
+  
+    function generateNaturalPlan(preferences, availability) {
+      switch (preferences) {
+        case 'Cardio':
+          return generateNaturalCardioPlan(availability);
+        case 'Strength':
+          return generateNaturalStrengthPlan(availability);
+        case 'Yoga':
+          return generateNaturalYogaPlan(availability);
+        case 'Pilates':
+          return generateNaturalPilatesPlan(availability);
+        case 'HIIT':
+          return generateNaturalHIITPlan(availability);
+        case 'Flexibility':
+          return generateNaturalFlexibilityPlan(availability);
+        case 'Endurance':
+          return generateNaturalEndurancePlan(availability);
+        default:
+          return 'Invalid preference';
+      }
+    }
+  
+    // Gym-specific Plans
+    function generateGymCardioPlan(availability) {
+      const timePerExercise = availability / 3;
+      return `
+        - Warm-up: 5 minutes on a treadmill or stationary bike<br>
+        - Main workout: ${timePerExercise.toFixed(0)} minutes of high-intensity treadmill running or cycling<br>
+        - Cool-down: 5 minutes of walking on the treadmill or slow cycling
+      `;
+    }
+  
+    function generateGymStrengthPlan(availability) {
+      const timePerExercise = availability / 4;
+      return `
+        - Warm-up: 5 minutes of light dynamic stretches<br>
+        - ${timePerExercise.toFixed(0)} minutes of Bench Press (3 sets of 10 reps)<br>
+        - ${timePerExercise.toFixed(0)} minutes of Leg Press (3 sets of 12 reps)<br>
+        - ${timePerExercise.toFixed(0)} minutes of Lat Pulldown (3 sets of 10 reps)<br>
+        - Cool-down: 5 minutes of foam rolling and stretching
+      `;
+    }
+  
+    function generateGymYogaPlan(availability) {
+      return generateYogaPlan(availability); // Use same as natural
+    }
+  
+    function generateGymPilatesPlan(availability) {
+      return generatePilatesPlan(availability); // Use same as natural
+    }
+  
+    function generateGymHIITPlan(availability) {
+      const intervalTime = availability / 6;
+      return `
+        - Warm-up: 5 minutes on a rowing machine<br>
+        - ${intervalTime.toFixed(0)} minutes of Sled Push (30 seconds work, 30 seconds rest)<br>
+        - ${intervalTime.toFixed(0)} minutes of Battle Ropes (30 seconds work, 30 seconds rest)<br>
+        - ${intervalTime.toFixed(0)} minutes of Kettlebell Swings (30 seconds work, 30 seconds rest)<br>
+        - Cool-down: 5 minutes of light rowing and stretching
+      `;
+    }
+  
+    function generateGymFlexibilityPlan(availability) {
+      return generateFlexibilityPlan(availability); // Use same as natural
+    }
+  
+    function generateGymEndurancePlan(availability) {
+      return generateEndurancePlan(availability); // Use same as natural
+    }
+  
+    // Natural Plans (no gym equipment)
+    function generateNaturalCardioPlan(availability) {
+      const timePerExercise = availability / 3;
+      return `
+        - Warm-up: 5 minutes of brisk walking or jogging<br>
+        - Main workout: ${timePerExercise.toFixed(0)} minutes of running or cycling outdoors<br>
+        - Cool-down: 5 minutes of light walking and stretching
+      `;
+    }
+  
+    function generateNaturalStrengthPlan(availability) {
+      const timePerExercise = availability / 4;
+      return `
+        - Warm-up: 5 minutes of dynamic stretches<br>
+        - ${timePerExercise.toFixed(0)} minutes of Bodyweight Squats (3 sets of 15 reps)<br>
+        - ${timePerExercise.toFixed(0)} minutes of Push-ups (3 sets of 12 reps)<br>
+        - ${timePerExercise.toFixed(0)} minutes of Lunges (3 sets of 10 reps per leg)<br>
+        - Cool-down: 5 minutes of stretching
+      `;
+    }
+  
+    function generateNaturalYogaPlan(availability) {
+      return generateYogaPlan(availability); // Same for natural and gym
+    }
+  
+    function generateNaturalPilatesPlan(availability) {
+      return generatePilatesPlan(availability); // Same for natural and gym
+    }
+  
+    function generateNaturalHIITPlan(availability) {
+      return generateHIITPlan(availability); // Same for natural and gym
+    }
+  
+    function generateNaturalFlexibilityPlan(availability) {
+      return generateFlexibilityPlan(availability); // Same for natural and gym
+    }
+  
+    function generateNaturalEndurancePlan(availability) {
+      return generateEndurancePlan(availability); // Same for natural and gym
+    }
+  
+    // Diet Plan
+    function generateDietPlan(preferences) {
+      switch (preferences) {
+        case 'Cardio':
+          return `
+            - Breakfast: Oatmeal with fruits and nuts<br>
+            - Lunch: Grilled chicken or fish with quinoa and mixed vegetables<br>
+            - Dinner: A light salad with lean protein (chicken or tofu)<br>
+            - Snacks: Almonds, fruits, and protein shakes
+          `;
+        case 'Strength':
+          return `
+            - Breakfast: Eggs with avocado and whole wheat toast<br>
+            - Lunch: Chicken breast with sweet potatoes and spinach<br>
+            - Dinner: Salmon with brown rice and broccoli<br>
+            - Snacks: Greek yogurt, nuts, and protein shakes
+          `;
+        case 'Yoga':
+          return `
+            - Breakfast: Smoothie bowl with spinach, bananas, and chia seeds<br>
+            - Lunch: Quinoa salad with chickpeas and a lemon vinaigrette<br>
+            - Dinner: Stir-fried tofu with mixed veggies and brown rice<br>
+            - Snacks: Fresh fruits, herbal teas, and nuts
+          `;
+        case 'Pilates':
+          return `
+            - Breakfast: Whole grain cereal with almond milk and berries<br>
+            - Lunch: Grilled veggies with hummus and pita bread<br>
+            - Dinner: Baked salmon with quinoa and steamed asparagus<br>
+            - Snacks: Mixed nuts, cottage cheese, and apple slices
+          `;
+        case 'HIIT':
+          return `
+            - Breakfast: Protein pancakes with blueberries<br>
+            - Lunch: Grilled chicken with a side of whole grains and vegetables<br>
+            - Dinner: Turkey chili with mixed beans and vegetables<br>
+            - Snacks: Protein bars, fruits, and nuts
+          `;
+        case 'Flexibility':
+          return `
+            - Breakfast: Chia seed pudding with fresh berries<br>
+            - Lunch: Lentil soup with a side of green salad<br>
+            - Dinner: Grilled veggies with tofu and quinoa<br>
+            - Snacks: Nuts, green smoothies, and yogurt
+          `;
+        case 'Endurance':
+          return `
+            - Breakfast: Peanut butter toast with bananas and honey<br>
+            - Lunch: Whole wheat pasta with chicken and a side salad<br>
+            - Dinner: Grilled steak with sweet potatoes and green beans<br>
+            - Snacks: Energy bars, nuts, and protein smoothies
+          `;
+        default:
+          return 'Please select a valid preference for diet.';
+      }
+    }
+    function saveWorkoutCompletion() {
+      const checkboxes = document.querySelectorAll('#workout-completion-list input[type="checkbox"]');
+      let pointsEarned = 0;
+      
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          pointsEarned += parseInt(checkbox.getAttribute('data-points'));
+        }
+      });
+    
+      // Save points to localStorage
+      localStorage.setItem('userPoints', pointsEarned);
+      
+      // Update points dropdown
+      const pointsDropdown = document.getElementById('points-dropdown');
+      pointsDropdown.innerHTML = `<option value="${pointsEarned}">Earned Points: ${pointsEarned}</option>`;
+      document.getElementById('points-output').classList.remove('hidden');
+      
+      // Update rankings
+      updateRankings();
+    }
+    
+    // Update rankings based on total points
+    function updateRankings() {
+      const rankingOutput = document.getElementById('ranking-output');
+      let rankings = [
+        { name: 'Alice Williams', points: 95 },
+        { name: 'John Doe', points: 90 },
+        { name: 'Michael Johnson', points: 85 },
+        { name: 'Sarah Lee', points: 80 },
+        { name: 'David Kim', points: 75 },
+        { name: 'You', points: parseInt(localStorage.getItem('userPoints')) || 0 }
+      ];
+    
+      rankings.sort((a, b) => b.points - a.points); // Sort by points
+    
+      let userRank = rankings.findIndex(user => user.name === 'You') + 1;
+      if (userRank === 0) userRank = 'Not Ranked';
+    
+      // Save user's rank and name to localStorage
+      localStorage.setItem('userRank', userRank);
+      localStorage.setItem('userName', 'You');
+    
+      let rankingList = '<ul>';
+      rankings.forEach((user, index) => {
+        rankingList += `<li>${index + 1}. ${user.name} - ${user.points} points</li>`;
+      });
+      rankingList += '</ul>';
+    
+      rankingOutput.innerHTML = rankingList;
+      rankingOutput.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

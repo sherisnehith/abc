@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitMe – User Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h1 class="text-3xl font-bold text-center mb-6">Login to FitMe</h1>
+
+    <!-- Login Form -->
+    <form id="login-form">
+      <div class="mb-4">
+        <label for="login-id" class="block text-gray-700">Login ID:</label>
+        <input type="text" id="login-id" class="w-full p-2 border rounded" placeholder="Enter your Login ID" required>
+      </div>
+      <div class="mb-4">
+        <label for="password" class="block text-gray-700">Password:</label>
+        <input type="password" id="password" class="w-full p-2 border rounded" placeholder="Enter your Password" required>
+      </div>
+      <div class="mb-4 text-right">
+        <a href="#" class="text-blue-500">Forgot your password?</a>
+      </div>
+      <button type="button" onclick="authenticateUser()" class="bg-blue-500 text-white p-2 w-full rounded">Login</button>
+    </form>
+
+    <!-- Error message -->
+    <div id="error-message" class="mt-4 p-4 bg-red-100 text-red-700 rounded hidden">
+      <!-- Error text will be displayed here -->
+    </div>
+
+  </div>
+
+  <script>
+    function authenticateUser() {
+      const loginId = document.getElementById('login-id').value;
+      const password = document.getElementById('password').value;
+      const errorMessage = document.getElementById('error-message');
+
+      // Basic Validation
+      if (!loginId || !password) {
+        errorMessage.innerHTML = 'Please enter both Login ID and Password';
+        errorMessage.classList.remove('hidden');
+        return;
+      }
+
+      // Example hard-coded authentication (for demonstration)
+      const storedLoginId = "user123";  // Replace with actual logic
+      const storedPassword = "password123";  // Replace with actual logic
+
+      // Check if login ID and password are correct
+      if (loginId === storedLoginId && password === storedPassword) {
+        // Redirect to the dashboard page
+        window.location.href = 'dashboard.html'; // Redirect to dashboard
+      } else {
+        // Show error message
+        errorMessage.innerHTML = 'Invalid Login ID or Password';
+        errorMessage.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

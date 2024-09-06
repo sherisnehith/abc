@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitMe – Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Navigation Menu -->
+  <nav class="bg-white shadow-md">
+    <div class="container mx-auto p-4 flex justify-between">
+      <div class="text-xl font-bold">FitMe Dashboard</div>
+      <ul class="flex space-x-4">
+        <li><a href="userdetails.html" class="text-blue-500 hover:underline">User Details</a></li> <!-- Link to userdetails.html -->
+        <li><a href="rankings.html" class="text-blue-500 hover:underline">Rankings</a></li> <!-- Updated link to rankings.html -->
+        <li><a href="fitness.html" class="text-blue-500 hover:underline">Fitness Plan</a></li> <!-- Link to fitness.html -->
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mx-auto p-6">
+
+    <!-- User Details Section -->
+    <section id="user-details" class="bg-white p-6 rounded shadow-md mb-6">
+      <h2 class="text-2xl font-semibold mb-4">User Details</h2>
+      <div id="user-info" class="text-gray-700">
+        <p><strong>Name:</strong> <span id="display-name">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="display-email">Loading...</span></p>
+        <p><strong>Age:</strong> <span id="display-age">Loading...</span></p>
+        <p><strong>Membership:</strong> <span id="display-membership">Loading...</span></p>
+      </div>
+    </section>
+
+    <!-- Rankings Section -->
+    <section id="rankings" class="bg-white p-6 rounded shadow-md mb-6">
+      <h2 class="text-2xl font-semibold mb-4">Rankings</h2>
+      <div id="ranking-info" class="text-gray-700">
+        <ul class="list-disc pl-6">
+          <li>1st - Alice Williams: 95 points</li>
+          <li>2nd - John Doe: 90 points</li>
+          <li>3rd - Michael Johnson: 85 points</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Fitness Plan Section -->
+    <section id="fitness-plan" class="bg-white p-6 rounded shadow-md">
+      <h2 class="text-2xl font-semibold mb-4">Fitness Plan</h2>
+      <p>This section will redirect to <strong>fitness.html</strong></p>
+    </section>
+    
+  </div>
+
+  <script>
+    // Fetch the saved user details from localStorage and display them
+    document.getElementById('display-name').textContent = localStorage.getItem('userName') || 'Not Provided';
+    document.getElementById('display-email').textContent = localStorage.getItem('userEmail') || 'Not Provided';
+    document.getElementById('display-age').textContent = localStorage.getItem('userAge') || 'Not Provided';
+    document.getElementById('display-membership').textContent = localStorage.getItem('userMembership') || 'Not Provided';
+  </script>
+
+</body>
+</html>
